@@ -3,12 +3,15 @@ import axios from 'axios';
 
 export default async function(req, res) {
   const response = await home(req, res);
-  let obj_falopa = await getAppData();
-  let obj_falopa_convert = convertObject(obj_falopa);
-  res.json(mergeObjects(response, obj_falopa_convert));
+
+  let menu = await getMenus();
+
+  let menu_convert = convertObjectToMenu(menu);
+
+  res.json(mergeObjects(response, menu_convert));
 }
 
-function convertObject(inputObj) {
+function convertObjectToMenu(inputObj) {
   const data = inputObj.data;
   const header = data[0].attributes.header;
   const footer = data[0].attributes.footer;
@@ -26,6 +29,11 @@ function convertObject(inputObj) {
     header,
     footer,
   };
+}
+
+function mergeArrayToObject(inputObj, tabs) {
+  inputObj.appData.tabs = tabs;
+  return mergedObject;
 }
 
 function mergeObjects(obj1, obj2) {
@@ -48,7 +56,12 @@ function mergeObjects(obj1, obj2) {
   return mergedObj;
 }
 
-const getAppData = async () => {
+const getMenus = async () => {
   const response = await axios.get('http://localhost:1337/api/menus?populate=*');
+  return response.data;
+};
+
+const getTabs = async () => {
+  const response = await axios.get('http://localhost:1337/api/tabs?populate=*');
   return response.data;
 };
